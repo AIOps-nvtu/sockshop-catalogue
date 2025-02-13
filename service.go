@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -95,7 +96,7 @@ func (s *catalogueService) List(tags []string, order string, pageNum, pageSize i
 
 	err := s.db.Select(&socks, query, args...)
 	if err != nil {
-		s.logger.Log("database error", err)
+		level.Error(s.logger).Log("database error", err)
 		return []Sock{}, ErrDBConnection
 	}
 	for i, s := range socks {
@@ -131,7 +132,7 @@ func (s *catalogueService) Count(tags []string) (int, error) {
 	sel, err := s.db.Prepare(query)
 
 	if err != nil {
-		s.logger.Log("database error", err)
+		level.Error(s.logger).Log("database error", err)
 		return 0, ErrDBConnection
 	}
 	defer sel.Close()
@@ -140,7 +141,7 @@ func (s *catalogueService) Count(tags []string) (int, error) {
 	err = sel.QueryRow(args...).Scan(&count)
 
 	if err != nil {
-		s.logger.Log("database error", err)
+		level.Error(s.logger).Log("database error", err)
 		return 0, ErrDBConnection
 	}
 
@@ -153,7 +154,7 @@ func (s *catalogueService) Get(id string) (Sock, error) {
 	var sock Sock
 	err := s.db.Get(&sock, query, id)
 	if err != nil {
-		s.logger.Log("database error", err)
+		level.Error(s.logger).Log("database error", err)
 		return Sock{}, ErrNotFound
 	}
 
@@ -186,14 +187,14 @@ func (s *catalogueService) Tags() ([]string, error) {
 	query := "SELECT name FROM tag;"
 	rows, err := s.db.Query(query)
 	if err != nil {
-		s.logger.Log("database error", err)
+		level.Error(s.logger).Log("database error", err)
 		return []string{}, ErrDBConnection
 	}
 	var tag string
 	for rows.Next() {
 		err = rows.Scan(&tag)
 		if err != nil {
-			s.logger.Log("database error", err)
+			level.Error(s.logger).Log("database error", err)
 			continue
 		}
 		tags = append(tags, tag)

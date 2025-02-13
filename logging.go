@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 )
 
 // LoggingMiddleware logs method calls, parameters, results, and elapsed time.
@@ -24,7 +25,7 @@ type loggingMiddleware struct {
 
 func (mw loggingMiddleware) List(tags []string, order string, pageNum, pageSize int) (socks []Sock, err error) {
 	defer func(begin time.Time) {
-		mw.logger.Log(
+		level.Info(mw.logger).Log(
 			"method", "List",
 			"tags", strings.Join(tags, ", "),
 			"order", order,
@@ -40,7 +41,7 @@ func (mw loggingMiddleware) List(tags []string, order string, pageNum, pageSize 
 
 func (mw loggingMiddleware) Count(tags []string) (n int, err error) {
 	defer func(begin time.Time) {
-		mw.logger.Log(
+		level.Info(mw.logger).Log(
 			"method", "Count",
 			"tags", strings.Join(tags, ", "),
 			"result", n,
@@ -53,7 +54,7 @@ func (mw loggingMiddleware) Count(tags []string) (n int, err error) {
 
 func (mw loggingMiddleware) Get(id string) (s Sock, err error) {
 	defer func(begin time.Time) {
-		mw.logger.Log(
+		level.Info(mw.logger).Log(
 			"method", "Get",
 			"id", id,
 			"sock", s.ID,
@@ -66,7 +67,7 @@ func (mw loggingMiddleware) Get(id string) (s Sock, err error) {
 
 func (mw loggingMiddleware) Tags() (tags []string, err error) {
 	defer func(begin time.Time) {
-		mw.logger.Log(
+		level.Info(mw.logger).Log(
 			"method", "Tags",
 			"result", len(tags),
 			"err", err,
@@ -78,7 +79,7 @@ func (mw loggingMiddleware) Tags() (tags []string, err error) {
 
 func (mw loggingMiddleware) Health() (health []Health) {
 	defer func(begin time.Time) {
-		mw.logger.Log(
+		level.Info(mw.logger).Log(
 			"method", "Health",
 			"result", len(health),
 			"took", time.Since(begin),
