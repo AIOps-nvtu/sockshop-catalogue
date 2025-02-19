@@ -36,7 +36,18 @@ func (mw loggingMiddleware) List(tags []string, order string, pageNum, pageSize 
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	return mw.next.List(tags, order, pageNum, pageSize)
+	socks, err = mw.next.List(tags, order, pageNum, pageSize)
+	if err != nil {
+		level.Error(mw.logger).Log(
+			"tags", strings.Join(tags, ", "),
+			"order", order,
+			"pageNum", pageNum,
+			"pageSize", pageSize,
+			"result", len(socks),
+			"err", err.Error(),
+		)
+	}
+	return socks, err
 }
 
 func (mw loggingMiddleware) Count(tags []string) (n int, err error) {
@@ -49,7 +60,16 @@ func (mw loggingMiddleware) Count(tags []string) (n int, err error) {
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	return mw.next.Count(tags)
+	n, err = mw.next.Count(tags)
+	if err != nil {
+		level.Error(mw.logger).Log(
+			"method", "Count",
+			"tags", strings.Join(tags, ", "),
+			"result", n,
+			"err", err.Error(),
+		)
+	}
+	return n, err
 }
 
 func (mw loggingMiddleware) Get(id string) (s Sock, err error) {
@@ -62,7 +82,16 @@ func (mw loggingMiddleware) Get(id string) (s Sock, err error) {
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	return mw.next.Get(id)
+	s, err = mw.next.Get(id)
+	if err != nil {
+		level.Error(mw.logger).Log(
+			"method", "Get",
+			"id", id,
+			"sock", s.ID,
+			"err", err.Error(),
+		)
+	}
+	return s, err
 }
 
 func (mw loggingMiddleware) Tags() (tags []string, err error) {
@@ -74,7 +103,15 @@ func (mw loggingMiddleware) Tags() (tags []string, err error) {
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	return mw.next.Tags()
+	tags, err = mw.next.Tags()
+	if err != nil {
+		level.Info(mw.logger).Log(
+			"method", "Tags",
+			"result", len(tags),
+			"err", err.Error(),
+		)
+	}
+	return tags, err
 }
 
 func (mw loggingMiddleware) Health() (health []Health) {

@@ -1,4 +1,4 @@
-FROM golang:1.23
+FROM golang:1.23 AS base
 
 COPY . /go/src/github.com/microservices-demo/catalogue/
 
@@ -9,6 +9,9 @@ RUN cd /go/src/github.com/microservices-demo/catalogue/ \
     # && CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app github.com/microservices-demo/catalogue/cmd/cataloguesvc
     && CGO_ENABLED=0 GOOS=linux go build -toolexec="orchestrion toolexec" -a -installsuffix cgo -o /app github.com/microservices-demo/catalogue/cmd/cataloguesvc
 
-CMD ["/app", "-port=8080"]
+FROM golang:1.23
+WORKDIR /
+COPY --from=base /app /
+EXPOSE 80
 
-EXPOSE 8080
+CMD ["/app", "-port=80"]
